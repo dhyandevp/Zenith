@@ -18,7 +18,7 @@ This file provides Gemini-specific integration. For the complete methodology, se
 
 1. **Plan Before You Build** — No code without specification
 2. **State Is Sacred** — Every action updates persistent memory
-3. **Context Is Limited** — Prevent degradation through hygiene
+3. **Context Is Limited** — Prevent degradation through hygiene.
 4. **Verify Empirically** — No "trust me, it works"
 
 ---
