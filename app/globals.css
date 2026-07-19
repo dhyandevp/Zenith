@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-aquamarine: #105D5E;
+  --color-mayan-jade: #009A6E;
+  --color-mint: #B3EDA9;
+  --color-clovers: #EBFADB;
+  --color-pine: #293E33;
+  --color-timeless: #767F7D;
+  --color-silver: #C2CBC9;
+  --color-solar: #E8E300;
+
+  --color-surface-dark: #32463A;
+  --color-card-dark: #3A4D42;
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background: var(--color-clovers);
+  --foreground: var(--color-pine);
+  --surface: rgba(255, 255, 255, 0.65);
+  --ambient-glow: var(--color-mint);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--color-pine);
+    --foreground: var(--color-clovers);
+    --surface: var(--color-surface-dark);
+    --card: var(--color-card-dark);
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  /* Aurora Forest Lighting */
+  background-image: radial-gradient(
+    circle at top right,
+    var(--ambient-glow) 0%,
+    transparent 40%
+  );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
