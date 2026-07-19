@@ -4,10 +4,10 @@ import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Star, MoreHorizontal, MoveRight } from "lucide-react";
+import { Star, MoreHorizontal } from "lucide-react";
 import { CategoryPlaceholder } from "../ui/CategoryPlaceholder";
 import { ContextMenuModal } from "../ui/ContextMenuModal";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export interface Artifact {
@@ -17,6 +17,8 @@ export interface Artifact {
   imageUrl?: string;
   source: string;
   size?: "sm" | "md" | "lg" | "wide";
+  isFavorite?: boolean;
+  url?: string;
 }
 
 interface ArtifactCardProps {
@@ -34,8 +36,15 @@ export function ArtifactCard({ artifact, className, isFocused }: ArtifactCardPro
     }
   };
 
-  const handleFavorite = () => {
-    alert("Favorited " + artifact.title);
+  const handleFavorite = async () => {
+    try {
+      const docRef = doc(db, "artifacts", artifact.id);
+      await updateDoc(docRef, {
+        isFavorite: !artifact.isFavorite
+      });
+    } catch (error) {
+      console.error("Failed to favorite:", error);
+    }
   };
 
   return (
@@ -61,19 +70,21 @@ export function ArtifactCard({ artifact, className, isFocused }: ArtifactCardPro
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
         </div>
       ) : (
-        <CategoryPlaceholder type={artifact.type} title={artifact.title} />
+        <CategoryPlaceholder type={artifact.type} />
       )}
 
       {/* Quick Actions (Top Right) */}
       <div className="absolute top-4 right-4 z-20 flex items-center gap-2 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
         <button 
           onClick={(e) => { e.preventDefault(); handleFavorite(); }}
+          aria-label={artifact.isFavorite ? "Unfavorite" : "Favorite"}
           className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/60 hover:text-aquamarine transition-colors"
         >
-          <Star size={18} />
+          <Star size={18} className={artifact.isFavorite ? "fill-aquamarine text-aquamarine" : ""} />
         </button>
         <button 
           onClick={(e) => { e.preventDefault(); setIsMenuOpen(true); }}
+          aria-label="More options"
           className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-black/60 hover:text-aquamarine transition-colors"
         >
           <MoreHorizontal size={18} />

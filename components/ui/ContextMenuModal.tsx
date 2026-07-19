@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ExternalLink, Star, FolderInput, Pencil, Trash2, Tag, Copy } from "lucide-react";
+import { X, ExternalLink, Star, FolderInput, Pencil, Trash2, Tag, Copy, LucideIcon } from "lucide-react";
 import { Artifact } from "@/components/cards/ArtifactCard";
 
 interface ContextMenuModalProps {
@@ -39,17 +39,19 @@ export function ContextMenuModal({ artifact, isOpen, onClose, onDelete, onFavori
               </h4>
               <button 
                 onClick={onClose}
+                aria-label="Close menu"
                 className="p-2 rounded-full bg-silver/20 hover:bg-silver/40 text-pine dark:text-clovers transition-colors"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <MenuButton icon={ExternalLink} label="Open Source URL" onClick={() => { alert("Opening source URL"); onClose(); }} />
-            <MenuButton icon={Star} label="Favorite" onClick={() => { onFavorite(); onClose(); }} />
-            <MenuButton icon={FolderInput} label="Move to Collection" onClick={() => { alert("Move to collection"); onClose(); }} />
-            <MenuButton icon={Pencil} label="Rename Artifact" onClick={() => { alert("Rename artifact"); onClose(); }} />
-            <MenuButton icon={Tag} label="Edit Tags" onClick={() => { alert("Edit tags"); onClose(); }} />
+            <MenuButton icon={ExternalLink} label="Open Source URL" onClick={() => { 
+              if (artifact.url) window.open(artifact.url, '_blank'); 
+              else alert("No URL available");
+              onClose(); 
+            }} />
+            <MenuButton icon={Star} label={artifact.isFavorite ? "Unfavorite" : "Favorite"} onClick={() => { onFavorite(); onClose(); }} />
             <MenuButton icon={Copy} label="Copy Link" onClick={() => { navigator.clipboard.writeText(window.location.origin + "/artifact/" + artifact.id); onClose(); }} />
             
             <div className="h-px bg-silver/20 my-2" />
@@ -67,7 +69,7 @@ export function ContextMenuModal({ artifact, isOpen, onClose, onDelete, onFavori
   );
 }
 
-function MenuButton({ icon: Icon, label, onClick, destructive }: { icon: any, label: string, onClick: () => void, destructive?: boolean }) {
+function MenuButton({ icon: Icon, label, onClick, destructive }: { icon: LucideIcon, label: string, onClick: () => void, destructive?: boolean }) {
   return (
     <button
       onClick={(e) => { e.preventDefault(); onClick(); }}

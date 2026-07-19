@@ -6,7 +6,6 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@clerk/nextjs";
 import { BentoGrid } from "./BentoGrid";
 import { Artifact } from "../cards/ArtifactCard";
-import { Loader2 } from "lucide-react";
 import { ArtifactCardSkeleton } from "./ArtifactCardSkeleton";
 
 export function LiveBentoGrid() {

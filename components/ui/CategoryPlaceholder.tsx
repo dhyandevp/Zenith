@@ -1,22 +1,22 @@
 import { FileText, GitBranch, Film, Book, MessageCircle, Image as ImageIcon, Gamepad2, Laptop, Music, Archive } from "lucide-react";
 import { ArtifactType } from "@/lib/actions/artifacts";
 
-export function CategoryPlaceholder({ type, title }: { type: ArtifactType; title: string }) {
-  const Icon = () => {
-    switch (type) {
-      case "ARTICLE": return <FileText size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "GITHUB": return <GitBranch size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "MOVIE": return <Film size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "BOOK": return <Book size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "TWEET": return <MessageCircle size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "IMAGE": return <ImageIcon size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "GAME": return <Gamepad2 size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "SOFTWARE": return <Laptop size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      case "MUSIC": return <Music size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-      default: return <Archive size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
-    }
-  };
+function getCategoryIcon(type: ArtifactType) {
+  switch (type) {
+    case "ARTICLE": return <FileText size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "GITHUB": return <GitBranch size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "MOVIE": return <Film size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "BOOK": return <Book size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "TWEET": return <MessageCircle size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "IMAGE": return <ImageIcon size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "GAME": return <Gamepad2 size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "SOFTWARE": return <Laptop size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    case "MUSIC": return <Music size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+    default: return <Archive size={48} className="text-aquamarine/60 group-hover:text-aquamarine transition-colors duration-500" />;
+  }
+}
 
+export function CategoryPlaceholder({ type }: { type: ArtifactType }) {
   return (
     <div className="absolute inset-0 z-0 bg-gradient-to-br from-pine to-black flex items-center justify-center overflow-hidden">
       {/* Abstract blurred blobs */}
@@ -25,7 +25,7 @@ export function CategoryPlaceholder({ type, title }: { type: ArtifactType; title
       
       {/* Icon Container */}
       <div className="relative z-10 w-24 h-24 rounded-full bg-white/5 border border-white/10 backdrop-blur-md flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 ease-out">
-        <Icon />
+        {getCategoryIcon(type)}
       </div>
 
       {/* Dark overlay for text readability at the bottom */}

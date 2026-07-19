@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { doc, getDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@clerk/nextjs";
 import { Artifact } from "@/components/cards/ArtifactCard";
@@ -11,11 +11,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { CategoryPlaceholder } from "@/components/ui/CategoryPlaceholder";
 
+type ExtendedArtifact = Artifact & {
+  description?: string;
+  tags?: string[];
+  createdAt?: Timestamp;
+  url?: string;
+};
+
 export default function ArtifactDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { userId } = useAuth();
-  const [artifact, setArtifact] = useState<Artifact & { description?: string; tags?: string[]; createdAt?: any; url?: string } | null>(null);
+  const [artifact, setArtifact] = useState<ExtendedArtifact | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +34,7 @@ export default function ArtifactDetailPage() {
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists() && docSnap.data().userId === userId) {
-          setArtifact({ id: docSnap.id, ...docSnap.data() } as any);
+          setArtifact({ id: docSnap.id, ...docSnap.data() } as ExtendedArtifact);
         } else {
           router.push("/not-found");
         }
@@ -89,7 +96,7 @@ export default function ArtifactDetailPage() {
               {artifact.imageUrl ? (
                 <Image src={artifact.imageUrl} alt={artifact.title} fill className="object-cover" priority />
               ) : (
-                <CategoryPlaceholder type={artifact.type} title={artifact.title} />
+                <CategoryPlaceholder type={artifact.type} />
               )}
             </div>
           </div>
