@@ -9,8 +9,7 @@ export default function FavoritesPage() {
       </header>
       
       <section>
-        {/* We will filter LiveBentoGrid to only show favorites in the future */}
-        <LiveBentoGrid />
+        <LiveBentoGrid filter={{ isFavorite: true }} />
       </section>
     </div>
   );

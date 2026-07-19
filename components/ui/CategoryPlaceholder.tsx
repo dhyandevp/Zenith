@@ -1,5 +1,5 @@
 import { FileText, GitBranch, Film, Book, MessageCircle, Image as ImageIcon, Gamepad2, Laptop, Music, Archive } from "lucide-react";
-import { ArtifactType } from "@/lib/actions/artifacts";
+import { ArtifactType } from "@/components/cards/ArtifactCard";
 
 function getCategoryIcon(type: ArtifactType) {
   switch (type) {

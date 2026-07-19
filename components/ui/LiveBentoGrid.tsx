@@ -1,14 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, where, orderBy, onSnapshot, QueryConstraint } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@clerk/nextjs";
 import { BentoGrid } from "./BentoGrid";
-import { Artifact } from "../cards/ArtifactCard";
+import { Artifact, ArtifactType } from "../cards/ArtifactCard";
 import { ArtifactCardSkeleton } from "./ArtifactCardSkeleton";
 
-export function LiveBentoGrid() {
+export interface LiveBentoGridProps {
+  filter?: {
+    isFavorite?: boolean;
+    collectionId?: string;
+    type?: ArtifactType;
+    search?: string;
+  }
+}
+
+export function LiveBentoGrid({ filter }: LiveBentoGridProps) {
   const { userId, isLoaded } = useAuth();
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,11 +31,25 @@ export function LiveBentoGrid() {
       return;
     }
 
-    const q = query(
-      collection(db, "artifacts"),
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
+    const constraints: QueryConstraint[] = [
+      where("userId", "==", userId)
+    ];
+
+    if (filter?.isFavorite !== undefined) {
+      constraints.push(where("isFavorite", "==", filter.isFavorite));
+    }
+    
+    if (filter?.collectionId) {
+      constraints.push(where("collectionId", "==", filter.collectionId));
+    }
+
+    if (filter?.type) {
+      constraints.push(where("type", "==", filter.type));
+    }
+
+    constraints.push(orderBy("createdAt", "desc"));
+
+    const q = query(collection(db, "artifacts"), ...constraints);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedArtifacts = snapshot.docs.map((doc) => ({
@@ -41,7 +64,7 @@ export function LiveBentoGrid() {
     });
 
     return () => unsubscribe();
-  }, [userId, isLoaded]);
+  }, [userId, isLoaded, filter?.collectionId, filter?.isFavorite, filter?.type]);
 
   if (loading) {
     return (
@@ -53,13 +76,25 @@ export function LiveBentoGrid() {
     );
   }
 
-  if (artifacts.length === 0) {
+  let displayedArtifacts = artifacts;
+  if (filter?.search) {
+    const q = filter.search.toLowerCase();
+    displayedArtifacts = artifacts.filter(a => 
+      a.title.toLowerCase().includes(q) || 
+      (a.description && a.description.toLowerCase().includes(q)) ||
+      (a.tags && a.tags.some(t => t.toLowerCase().includes(q)))
+    );
+  }
+
+  if (displayedArtifacts.length === 0) {
     return (
       <div className="text-center py-20 border border-silver/20 rounded-[20px] bg-white/10 dark:bg-pine/10 backdrop-blur-md">
-        <p className="font-body text-timeless">No artifacts curated yet. Paste a URL to begin.</p>
+        <p className="font-body text-timeless">
+          {filter?.search ? "No artifacts match your search." : "No artifacts found here."}
+        </p>
       </div>
     );
   }
 
-  return <BentoGrid artifacts={artifacts} />;
+  return <BentoGrid artifacts={displayedArtifacts} />;
 }

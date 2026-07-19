@@ -7,18 +7,23 @@ import { useState } from "react";
 import { Star, MoreHorizontal } from "lucide-react";
 import { CategoryPlaceholder } from "../ui/CategoryPlaceholder";
 import { ContextMenuModal } from "../ui/ContextMenuModal";
+import { EditArtifactModal } from "../modals/EditArtifactModal";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+
+export type ArtifactType = "ARTICLE" | "GITHUB" | "MOVIE" | "BOOK" | "TWEET" | "IMAGE" | "GAME" | "SOFTWARE" | "MUSIC";
 
 export interface Artifact {
   id: string;
   title: string;
-  type: "ARTICLE" | "GITHUB" | "MOVIE" | "BOOK" | "TWEET" | "IMAGE" | "GAME" | "SOFTWARE" | "MUSIC";
+  description?: string;
+  type: ArtifactType;
   imageUrl?: string;
   source: string;
   size?: "sm" | "md" | "lg" | "wide";
   isFavorite?: boolean;
   url?: string;
+  tags?: string[];
 }
 
 interface ArtifactCardProps {
@@ -29,6 +34,7 @@ interface ArtifactCardProps {
 
 export function ArtifactCard({ artifact, className, isFocused }: ArtifactCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this artifact?")) {
@@ -111,7 +117,14 @@ export function ArtifactCard({ artifact, className, isFocused }: ArtifactCardPro
       onClose={() => setIsMenuOpen(false)}
       onDelete={handleDelete}
       onFavorite={handleFavorite}
+      onEdit={() => { setIsMenuOpen(false); setIsEditOpen(true); }}
     />
+    {isEditOpen && (
+      <EditArtifactModal 
+        artifact={artifact} 
+        onClose={() => setIsEditOpen(false)} 
+      />
+    )}
     </>
   );
 }

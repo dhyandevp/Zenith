@@ -6,10 +6,11 @@ import { doc, getDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@clerk/nextjs";
 import { Artifact } from "@/components/cards/ArtifactCard";
-import { ArrowLeft, Star, Trash2, ExternalLink, Calendar, Tag, Folder } from "lucide-react";
+import { ArrowLeft, Star, Trash2, ExternalLink, Calendar, Tag, Folder, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { CategoryPlaceholder } from "@/components/ui/CategoryPlaceholder";
+import { EditArtifactModal } from "@/components/modals/EditArtifactModal";
 
 type ExtendedArtifact = Artifact & {
   description?: string;
@@ -24,6 +25,7 @@ export default function ArtifactDetailPage() {
   const { userId } = useAuth();
   const [artifact, setArtifact] = useState<ExtendedArtifact | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -134,6 +136,12 @@ export default function ArtifactDetailPage() {
               <button className="bg-white/40 dark:bg-black/20 border border-silver/30 px-6 py-3 rounded-full font-display font-medium text-pine dark:text-clovers flex items-center gap-2 hover:bg-white/60 dark:hover:bg-black/40 transition-colors">
                 <Star size={18} /> Favorite
               </button>
+              <button 
+                onClick={() => setIsEditOpen(true)}
+                className="bg-white/40 dark:bg-black/20 border border-silver/30 px-6 py-3 rounded-full font-display font-medium text-pine dark:text-clovers flex items-center gap-2 hover:bg-white/60 dark:hover:bg-black/40 transition-colors"
+              >
+                <Pencil size={18} /> Edit
+              </button>
             </div>
           </div>
         </div>
@@ -185,6 +193,18 @@ export default function ArtifactDetailPage() {
           </button>
         </div>
       </div>
+      
+      {isEditOpen && artifact && (
+        <EditArtifactModal 
+          artifact={artifact} 
+          onClose={() => {
+            setIsEditOpen(false);
+            // In a real app we might fetch again or let onSnapshot handle it.
+            // Since we use getDoc instead of onSnapshot here, we might want to reload
+            window.location.reload(); 
+          }} 
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use server";
 
-import { ArtifactType } from "./artifacts";
+import { auth } from "@clerk/nextjs/server";
+import { ArtifactType } from "@/components/cards/ArtifactCard";
 
 export interface AIArtifactMetadata {
   title: string;
@@ -14,6 +15,11 @@ export interface AIArtifactMetadata {
 }
 
 export async function searchWithAI(query: string): Promise<AIArtifactMetadata> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new Error("OpenRouter API key is missing. Please add it to your environment variables.");
@@ -33,7 +39,8 @@ Analyze the query and return ONLY a strict JSON object with the following schema
   "imageUrl": "A direct URL to a high-quality poster or thumbnail if known (or null)",
   "tags": ["Array", "of", "3-5", "relevant", "tags"],
   "confidence": A number from 0 to 1 indicating your confidence in this classification
-}`;
+}
+CRITICAL: Do not invent metadata if you are unsure. Favor precision over hallucination.`;
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
