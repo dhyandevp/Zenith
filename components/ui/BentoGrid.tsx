@@ -1,5 +1,6 @@
-import { Artifact, ArtifactCard } from "@/components/cards/ArtifactCard";
+import { ArtifactCard } from "@/components/cards/ArtifactCard";
 import { useArtifactKeyboardNav } from "@/hooks/useArtifactKeyboardNav";
+import type { Artifact } from "@/types/artifact";
 
 interface BentoGridProps {
   artifacts: Artifact[];
@@ -12,7 +13,7 @@ export function BentoGrid({ artifacts }: BentoGridProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-[250px]">
       {artifacts.map((artifact, index) => {
         let spanClass = "";
-        
+
         switch (artifact.size) {
           case "lg":
             spanClass = "md:col-span-2 md:row-span-2";
@@ -30,9 +31,9 @@ export function BentoGrid({ artifacts }: BentoGridProps) {
         }
 
         return (
-          <ArtifactCard 
-            key={artifact.id} 
-            artifact={artifact} 
+          <ArtifactCard
+            key={artifact.id}
+            artifact={artifact}
             className={spanClass}
             isFocused={focusedIndex === index}
           />

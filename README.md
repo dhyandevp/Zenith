@@ -1,80 +1,144 @@
 # Zenith
 
-Zenith is a premium, AI-powered digital curational tool designed to help you save, organize, and retrieve anything on the internet with a single click. Think of it as your intelligent second brain, beautifully designed with the "Aurora Forest" aesthetic.
+A public digital museum for the internet. Discover, explore, and share curated artifacts — movies, games, books, software, music, articles, and more — beautifully organized in one place.
+
+Zenith uses AI to instantly classify any search query or URL, generating rich metadata, categories, and artwork previews.
 
 ## Features
 
-- **Universal Saving:** Save links, articles, movies, books, games, repositories, and tweets.
-- **AI-Powered Metadata:** Zenith uses OpenRouter AI (Google Gemini 2.5 Flash) to automatically classify your links, generate rich descriptions, and extract relevant tags instantly.
-- **Collections & Favorites:** Group your artifacts into custom collections or favorite them for quick access.
-- **Live Search & Filtering:** Instantly search through your entire library and filter by content type (e.g., Article, GitHub, Movie) with zero latency.
-- **Premium Interface:** A stunning, responsive UI built with Tailwind v4, utilizing glassmorphism, fluid micro-animations, and dynamic bento grid layouts.
+- **Universal Search** — Search for anything: movies, games, books, GitHub repos, articles, music, software, or paste any URL. The AI engine classifies, describes, and categorizes it instantly.
+- **Artifact Pages** — Every item gets a beautiful, dedicated page with artwork, metadata, tags, and external links.
+- **Explore & Filter** — Browse the entire catalog with real-time search and type-based filtering.
+- **Collections** — Browse curated collections of related artifacts.
+- **Bento Grid Layout** — Responsive, dynamic card layouts with keyboard navigation.
+- **Aurora Forest Design** — A premium interface with glassmorphism, fluid micro-animations, and a natural color palette.
 
 ## Technology Stack
 
-- **Framework**: Next.js 16.2 (App Router, Turbopack)
-- **Styling**: Tailwind CSS v4 & Framer Motion
-- **Authentication**: Clerk
-- **Database**: Firebase Firestore (NoSQL, Real-time)
-- **Intelligence**: OpenRouter API
-- **Deployment**: Firebase Hosting / Cloudflare (via OpenNext)
+| Category       | Technology                              |
+| -------------- | --------------------------------------- |
+| Framework      | Next.js 16 (App Router)                |
+| Language       | TypeScript 5                            |
+| Styling        | Tailwind CSS v4                         |
+| Animations     | Framer Motion                           |
+| Database       | Firebase Firestore (real-time, NoSQL)   |
+| AI Engine      | OpenRouter API (Google Gemini 2.5 Flash)|
+| Icons          | Lucide React                            |
 
 ## Folder Structure
 
 ```text
 /
-├── app/                  # Next.js App Router (Pages, Layouts, API Routes)
-├── components/           # Reusable React components
-│   ├── cards/            # Artifact cards and skeletons
-│   ├── layout/           # Sidebar, Navigation, Footer
-│   ├── modals/           # Popovers and dialogs (Edit, Context, Create)
-│   ├── search/           # Intelligent search bar and previews
-│   └── ui/               # Core atomic UI components
-├── lib/                  # Utility functions, Server Actions, Firebase init
-├── public/               # Static assets
-└── styles/               # Global CSS
+├── app/                       # Next.js App Router
+│   ├── (public)/              # Public routes (explore, artifact, collections)
+│   │   ├── artifact/[slug]/   # Individual artifact pages
+│   │   ├── collections/       # Collection browsing
+│   │   └── explore/           # Full catalog with search & filters
+│   ├── layout.tsx             # Root layout with SEO metadata
+│   ├── page.tsx               # Landing page
+│   ├── sitemap.ts             # Dynamic sitemap
+│   └── robots.ts              # Robots.txt config
+├── components/                # Reusable React components
+│   ├── cards/                 # Artifact cards
+│   ├── layout/                # Navigation, Footer
+│   ├── search/                # Search input & preview sheet
+│   └── ui/                    # Core UI components (BentoGrid, Hero, etc.)
+├── constants/                 # Shared constants (categories)
+├── hooks/                     # Custom React hooks
+├── lib/                       # Utilities & server actions
+│   ├── actions/               # Server actions (AI search)
+│   └── firebase.ts            # Firebase client SDK config
+├── types/                     # TypeScript type definitions
+└── public/                    # Static assets
 ```
 
-## Running Locally
+## Getting Started
 
-### 1. Prerequisites
+### Prerequisites
+
 - Node.js 20+
-- A Firebase Project (with Firestore enabled)
-- A Clerk Account
-- An OpenRouter Account (for AI extraction)
+- A Firebase project with Firestore enabled
+- An [OpenRouter](https://openrouter.ai) API key
 
-### 2. Environment Variables
-Copy `.env.example` to `.env.local` and populate it with your credentials:
+### Installation
+
+```bash
+git clone https://github.com/your-username/zenith.git
+cd zenith
+npm install
+```
+
+### Environment Variables
+
+Copy the example environment file and fill in your credentials:
 
 ```bash
 cp .env.example .env.local
 ```
 
-### 3. Installation
-Install the dependencies:
+| Variable                              | Description                         |
+| ------------------------------------- | ----------------------------------- |
+| `NEXT_PUBLIC_FIREBASE_API_KEY`        | Firebase client API key             |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`    | Firebase auth domain                |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID`     | Firebase project ID                 |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket             |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID  |
+| `NEXT_PUBLIC_FIREBASE_APP_ID`         | Firebase app ID                     |
+| `OPENROUTER_API_KEY`                  | OpenRouter API key for AI search    |
+| `NEXT_PUBLIC_APP_URL`                 | Public URL (for sitemap, OG tags)   |
 
-```bash
-npm install
-```
-
-### 4. Development Server
-Start the Turbopack development server:
+### Development
 
 ```bash
 npm run dev
 ```
-Navigate to `http://localhost:3000` to view the application.
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+### Production Build
+
+```bash
+npm run build
+npm start
+```
+
+### Linting & Type Checking
+
+```bash
+npm run lint
+npm run type-check
+```
 
 ## Deployment
 
-Zenith is fully optimized for production deployment on Firebase.
+Zenith is a standard Next.js application and can be deployed to any platform that supports it:
 
-1. Ensure your `.firebaserc` is pointing to the correct project.
-2. Deploy your strict Firestore rules and indexing schema:
+- **Vercel** — Zero-config deployment
+- **Cloudflare Pages** — Via OpenNext adapter
+- **Firebase Hosting** — With `next export` or Cloud Run
+
+Deploy Firestore rules and indexes:
+
 ```bash
 npx firebase-tools deploy --only firestore
 ```
-3. Build and deploy your Next.js application using your preferred CI/CD or hosting provider (e.g., Cloudflare Pages with OpenNext, or Vercel).
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add your feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+## Developer
+
+Developed and maintained by **Dhyandev P**
+
+Developer Links:
+- [Portfolio & Contact](https://linktr.ee/DhyandevRTX)
+- [GitHub](https://github.com/DhyandevP)
+- [LinkedIn](https://linkedin.com/in/DhyandevP)
 
 ## License
 

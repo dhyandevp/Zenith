@@ -8,7 +8,6 @@
   --color-pine: #293E33;
   --color-timeless: #767F7D;
   --color-silver: #C2CBC9;
-  --color-solar: #E8E300;
 
   --color-surface-dark: #32463A;
   --color-card-dark: #3A4D42;
@@ -21,16 +20,12 @@
 :root {
   --background: var(--color-clovers);
   --foreground: var(--color-pine);
-  --surface: rgba(255, 255, 255, 0.65);
-  --ambient-glow: var(--color-mint);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: var(--color-pine);
     --foreground: var(--color-clovers);
-    --surface: var(--color-surface-dark);
-    --card: var(--color-card-dark);
   }
 }
 
@@ -41,9 +36,41 @@ body {
   /* Aurora Forest Lighting */
   background-image: radial-gradient(
     circle at top right,
-    var(--ambient-glow) 0%,
+    var(--color-mint) 0%,
     transparent 40%
   );
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+/* Focus Visible — Accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-aquamarine);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Smooth scrolling for users who prefer it */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom selection color */
+::selection {
+  background-color: var(--color-aquamarine);
+  color: white;
 }

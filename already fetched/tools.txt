@@ -1,0 +1,104 @@
+AWS - Amazon Web Services, a comprehensive cloud computing platform.
+Alibaba - A major e-commerce and technology company offering retail, cloud computing, and more.
+Amazon - A multinational technology company focusing on e-commerce, cloud computing, and AI.
+Amazon Prime Video - A subscription video on-demand over-the-top streaming and rental service.
+Animista - An on-demand CSS animations library for developers.
+Antigravity - An AI coding assistant or internal tool framework.
+Anyscale - A managed ray platform for scaling AI applications.
+Apple Notes - A note-taking app developed by Apple.
+Arc - A modern web browser developed by The Browser Company.
+Azure - Microsoft's public cloud computing platform.
+Brave - A privacy-focused web browser that blocks trackers and ads.
+ChatGPT - An AI chatbot developed by OpenAI.
+Chroma - An open-source vector database for AI applications.
+Claude - An AI assistant developed by Anthropic.
+Clerk - A user authentication and management service for applications.
+Cloudflare - A web performance and security company providing CDN and DDoS mitigation.
+Cloudflare Pages - A JAMstack platform for frontend developers to collaborate and deploy websites.
+Cluely - An AI-powered tool for recording and analyzing meetings.
+Coreweave - A specialized cloud provider for large-scale GPU workloads.
+Cursor - An AI-powered code editor built on top of VS Code.
+Datadog - An observability service for cloud-scale applications.
+Deno Deploy - A globally distributed serverless system for running JavaScript/TypeScript.
+Discord - A voice, video, and text communication service popular among gamers and communities.
+Docker - A platform for developing, shipping, and running applications in containers.
+Edge - A web browser developed by Microsoft.
+Elastic - A search and analytics engine for data exploration and observability.
+Entri Proctor - An AI-powered proctoring solution for online exams.
+Evernote - A popular note-taking and task management application.
+Figma - A collaborative web-based interface design tool.
+Firefox - A free and open-source web browser developed by the Mozilla Foundation.
+Flipkart - An Indian e-commerce company.
+GCP - Google Cloud Platform, a suite of cloud computing services.
+Gemini - An AI model developed by Google.
+GitHub - A platform for version control and collaboration for software development.
+Google Keep - A note-taking service by Google.
+Google Lens - An image recognition technology that brings up relevant information using visual analysis.
+Google Meet - A video communication service developed by Google.
+Google Search - A web search engine developed by Google.
+Google Sign-in - An authentication system allowing users to log in with their Google accounts.
+Grafana - An open-source analytics and interactive visualization web application.
+Instagram - A photo and video sharing social networking service.
+Jira - A proprietary issue tracking product developed by Atlassian for bug tracking and agile project management.
+Kubernetes - An open-source container orchestration system for automating software deployment.
+Lambda - Serverless computing service provided by AWS or Lambda Labs (GPU cloud provider).
+Linear - An issue tracking tool built for modern product teams.
+LlamaIndex - A data framework for LLM-based applications.
+Mailwave - A service for creating free disposable instant and private email addresses.
+Messages - An SMS/MMS messaging app.
+Meta AI - An artificial intelligence assistant developed by Meta.
+Microsoft Copilot - An AI companion developed by Microsoft.
+Microsoft Teams - A business communication platform developed by Microsoft.
+Milvus - An open-source vector database for scalable similarity search.
+MongoDB - A source-available cross-platform document-oriented database program.
+MySQL - An open-source relational database management system.
+Namecheap - A domain name registrar and web hosting company.
+Next.js - A React framework for production-grade web applications.
+Node.js - A cross-platform, open-source JavaScript runtime environment.
+Notion - A productivity and note-taking web application.
+Nvidia - A multinational technology company known for designing GPUs.
+Obsidian - A powerful knowledge base that works on top of a local folder of plain text Markdown files.
+OneNote - A digital note-taking app by Microsoft.
+OpenAI - An AI research and deployment company.
+OpenClaw - A platform/tool (possibly an open-source project or app deployment tool).
+Opera - A multi-platform web browser.
+Phosphor Icons - A flexible icon family for interfaces, diagrams, and presentations.
+Pinecone - A managed vector database for machine learning applications.
+PostHog - An open-source product analytics platform.
+PostgreSQL - A free and open-source relational database management system.
+Postman - An API platform for building and using APIs.
+Postgres - Abbreviation for PostgreSQL database.
+Prime Video - Amazon's streaming video service.
+Python - A high-level, general-purpose programming language.
+Qdrant - A vector similarity search engine and vector database.
+React - A free and open-source front-end JavaScript library for building user interfaces.
+Redis - An in-memory data structure store used as a database, cache, and message broker.
+Render - A unified cloud to build and run all your apps and websites.
+Resend - An email API for developers.
+Roam Research - A note-taking tool for networked thought.
+Safari - A graphical web browser developed by Apple.
+Screen Metrics Tool - A digital utility for checking screen resolution and viewport data.
+Sentry - An application monitoring platform for error tracking and performance.
+Skool - A platform for building communities and offering courses.
+Slack - A messaging program designed specifically for the office.
+Slack Huddles - An audio and video communication feature within Slack.
+Spotify - A proprietary Swedish audio streaming and media services provider.
+Stripe - A payment processing platform for internet businesses.
+Supabase - An open-source Firebase alternative providing a Postgres database, authentication, and more.
+Surge - A static web publishing platform for front-end developers.
+Surge.sh - Website for Surge, the static web publishing platform.
+Terraform - An infrastructure as code software tool created by HashiCorp.
+UIDAI - Unique Identification Authority of India, issuer of Aadhaar.
+Upstash - Serverless data platform (Redis and Kafka) for developers.
+Vercel - A cloud platform for static frontends and serverless functions, creators of Next.js.
+Visual Studio Code - A source-code editor made by Microsoft.
+Weaviate - An open-source vector database.
+Webex - A suite of cloud-based collaboration and virtual meeting tools by Cisco.
+WhatsApp - A freeware, cross-platform, centralized instant messaging service.
+Y Combinator - A technology startup accelerator.
+YouTube - An online video sharing and social media platform.
+Zoom - A videotelephony software program.
+Chrome - A cross-platform web browser developed by Google.
+d-Matrix - An AI hardware startup building energy-efficient compute platforms.
+npx - A package runner tool that comes with npm.
+shadcn/ui - A collection of re-usable components built using Radix UI and Tailwind CSS.

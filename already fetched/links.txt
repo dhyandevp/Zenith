@@ -1,0 +1,32 @@
+192.168.1.13:3000 - A local network IP address and port typically used for testing web applications in development.
+arc.net - The official website for the Arc web browser.
+brave.com - The official website for the Brave web browser.
+claude.ai - The web interface for interacting with Anthropic's Claude AI assistant.
+cursor.sh - The official website for the Cursor AI code editor.
+daaym.store - An e-commerce website domain.
+digitalbook.io - A platform offering free audiobooks and eBooks.
+discord.com - The official website for the Discord communication platform.
+dnsleaktest.com - A tool to test if your VPN is leaking your DNS queries.
+docs.docker.com - The official documentation site for Docker.
+github.com/anthropics/skills - A GitHub repository containing AI skills by Anthropic.
+github.com/cloudflare/skills - A GitHub repository containing AI skills by Cloudflare.
+github.com/facebook/react - The GitHub repository for the React JavaScript library.
+github.com/shadcn/ui - The GitHub repository for the shadcn/ui component library.
+https://deno.com/deploy - The landing page for Deno's serverless deployment platform.
+https://pages.cloudflare.com - The landing page for Cloudflare Pages hosting service.
+https://render.com - The official website for the Render cloud hosting platform.
+https://surge.sh - The official website for the Surge static web publishing tool.
+kubernetes.io - The official website and documentation for Kubernetes.
+linktr.ee/DhyandevRTX - A Linktree profile aggregating links for the user.
+mailwave.dev - A service for creating free disposable temporary email addresses.
+mcaffeine.com - The official e-commerce website for the mCaffeine personal care brand.
+meet.google.com - The web interface for Google Meet video conferencing.
+notion.so - The official website for the Notion productivity application.
+obsidian.md - The official website for the Obsidian note-taking app.
+payments.spotify.com - The payment portal for Spotify subscriptions.
+postgresml.org - The official website for PostgresML, a machine learning extension for PostgreSQL.
+roamresearch.com - The official website for the Roam Research note-taking tool.
+spotify.com/in-en/pu... - A Spotify web URL, likely for account management or premium subscription.
+thenetworkdna.com - A technology blog focusing on networking and data centers.
+uidai.gov.in - The official website of the Unique Identification Authority of India (Aadhaar).
+zoom.us - The official website for the Zoom video communications platform.

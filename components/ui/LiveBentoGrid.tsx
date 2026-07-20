@@ -1,44 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, onSnapshot, QueryConstraint } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  where,
+  onSnapshot,
+  QueryConstraint,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useAuth } from "@clerk/nextjs";
 import { BentoGrid } from "./BentoGrid";
-import { Artifact, ArtifactType } from "../cards/ArtifactCard";
 import { ArtifactCardSkeleton } from "./ArtifactCardSkeleton";
+import type { Artifact, ArtifactType } from "@/types/artifact";
 
 export interface LiveBentoGridProps {
   filter?: {
-    isFavorite?: boolean;
     collectionId?: string;
     type?: ArtifactType;
     search?: string;
-  }
+  };
 }
 
 export function LiveBentoGrid({ filter }: LiveBentoGridProps) {
-  const { userId, isLoaded } = useAuth();
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoaded) return;
-    
-    if (!userId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(false);
-      return;
-    }
+    const constraints: QueryConstraint[] = [];
 
-    const constraints: QueryConstraint[] = [
-      where("userId", "==", userId)
-    ];
-
-    if (filter?.isFavorite !== undefined) {
-      constraints.push(where("isFavorite", "==", filter.isFavorite));
-    }
-    
     if (filter?.collectionId) {
       constraints.push(where("collectionId", "==", filter.collectionId));
     }
@@ -51,20 +41,23 @@ export function LiveBentoGrid({ filter }: LiveBentoGridProps) {
 
     const q = query(collection(db, "artifacts"), ...constraints);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedArtifacts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Artifact[];
-      setArtifacts(fetchedArtifacts);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching artifacts:", error);
-      setLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedArtifacts = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Artifact[];
+        setArtifacts(fetchedArtifacts);
+        setLoading(false);
+      },
+      () => {
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
-  }, [userId, isLoaded, filter?.collectionId, filter?.isFavorite, filter?.type]);
+  }, [filter?.collectionId, filter?.type]);
 
   if (loading) {
     return (
@@ -79,10 +72,11 @@ export function LiveBentoGrid({ filter }: LiveBentoGridProps) {
   let displayedArtifacts = artifacts;
   if (filter?.search) {
     const q = filter.search.toLowerCase();
-    displayedArtifacts = artifacts.filter(a => 
-      a.title.toLowerCase().includes(q) || 
-      (a.description && a.description.toLowerCase().includes(q)) ||
-      (a.tags && a.tags.some(t => t.toLowerCase().includes(q)))
+    displayedArtifacts = artifacts.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        (a.description && a.description.toLowerCase().includes(q)) ||
+        (a.tags && a.tags.some((t) => t.toLowerCase().includes(q)))
     );
   }
 
@@ -90,7 +84,9 @@ export function LiveBentoGrid({ filter }: LiveBentoGridProps) {
     return (
       <div className="text-center py-20 border border-silver/20 rounded-[20px] bg-white/10 dark:bg-pine/10 backdrop-blur-md">
         <p className="font-body text-timeless">
-          {filter?.search ? "No artifacts match your search." : "No artifacts found here."}
+          {filter?.search
+            ? "No artifacts match your search."
+            : "No artifacts found here yet."}
         </p>
       </div>
     );

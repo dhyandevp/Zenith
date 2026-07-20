@@ -1,26 +1,51 @@
-"use server";
-
-import type { AIArtifactMetadata } from "@/types/artifact";
-import { VALID_TYPES } from "@/constants/categories";
 import * as cheerio from "cheerio";
+import { readFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 
-// Utility to fetch and extract OpenGraph metadata from a URL
-async function fetchOpenGraphData(url: string) {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(__dirname, "..");
+
+// Load .env.local manually
+function loadEnv() {
+  const envPath = resolve(ROOT, ".env.local");
+  const content = readFileSync(envPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    let value = trimmed.slice(eqIdx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    process.env[key] = value;
+  }
+}
+loadEnv();
+
+async function fetchOpenGraphData(url) {
+  console.log(`\n[2] Fetching authoritative URL: ${url}`);
   try {
     const response = await fetch(url, {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
       },
-      signal: AbortSignal.timeout(4000), // 4 second timeout
+      signal: AbortSignal.timeout(4000),
     });
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.log(`    ❌ Failed to fetch URL. Status: ${response.status}`);
+      return null;
+    }
 
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const getMeta = (property: string) => 
+    const getMeta = (property) => 
       $(`meta[property='${property}']`).attr("content") || 
       $(`meta[name='${property}']`).attr("content") || 
       null;
@@ -29,28 +54,26 @@ async function fetchOpenGraphData(url: string) {
     const ogTitle = getMeta("og:title") || getMeta("twitter:title") || $("title").text();
     const ogDescription = getMeta("og:description") || getMeta("twitter:description") || getMeta("description");
 
+    console.log(`    ✅ Successfully scraped OpenGraph data!`);
     return {
       title: ogTitle,
       description: ogDescription,
       imageUrl: ogImage?.startsWith("/") ? new URL(ogImage, url).toString() : ogImage,
     };
   } catch (error) {
-    console.warn(`Failed to fetch OpenGraph data for ${url}:`, error);
+    console.warn(`    ❌ Error fetching OpenGraph data:`, error.message);
     return null;
   }
 }
 
-export async function searchWithAI(query: string): Promise<AIArtifactMetadata> {
+async function testSearch(query) {
+  console.log(`\n======================================================`);
+  console.log(`[1] AI Classification Phase for query: "${query}"`);
+  
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "OpenRouter API key is missing. Please add OPENROUTER_API_KEY to your environment variables."
-    );
-  }
-
   const systemPrompt = `You are the Zenith intelligence engine.
 Your task is to classify a user's search query into an artifact.
-The query could be a URL or a natural language string (e.g., "Lovable", "Interstellar", "React").
+The query could be a URL or a natural language string.
 
 Analyze the query and return ONLY a strict JSON object with the following schema, with no markdown formatting or extra text:
 {
@@ -86,44 +109,41 @@ CRITICAL: Do not invent metadata. Favor precision over hallucination. Prioritize
     }
   );
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`AI classification failed (${response.status}): ${body}`);
-  }
-
   const data = await response.json();
-  let content: string = data.choices[0].message.content;
-
-  // Strip markdown fencing if present
-  if (content.startsWith("```json")) {
-    content = content.replace(/```json\n?/, "").replace(/```$/, "");
+  let content = data.choices[0].message.content;
+  if (content.startsWith("\`\`\`json")) {
+    content = content.replace(/\`\`\`json\n?/, "").replace(/\`\`\`$/, "");
   }
 
-  const parsed: AIArtifactMetadata = JSON.parse(content);
+  const parsed = JSON.parse(content);
+  console.log(`    🤖 AI Output (Before Enrichment):`);
+  console.log(JSON.stringify(parsed, null, 2));
 
-  // Validate type — fall back to ARTICLE if the model invents one
-  if (!VALID_TYPES.has(parsed.type)) {
-    parsed.type = "ARTICLE";
-  }
-
-  // ENRICHMENT PHASE: If AI provided a URL, scrape it for authoritative metadata & images
   if (parsed.url) {
     const ogData = await fetchOpenGraphData(parsed.url);
     if (ogData) {
-      // Prioritize scraped high-quality images and official descriptions
-      parsed.imageUrl = ogData.imageUrl || parsed.imageUrl;
+      console.log(`\n[3] Enrichment Phase Merge:`);
+      console.log(`    🖼️  OG Image: ${ogData.imageUrl || 'None'}`);
+      console.log(`    📝  OG Description: ${ogData.description ? ogData.description.substring(0, 100) + '...' : 'None'}`);
       
-      // Only override description/title if the scraped ones are substantial
+      parsed.imageUrl = ogData.imageUrl || parsed.imageUrl;
       if (ogData.description && ogData.description.length > 20) {
         parsed.description = ogData.description;
       }
-      
       if (ogData.title && ogData.title.length > 2 && parsed.confidence < 0.8) {
-        // If AI wasn't very confident, trust the official site's title
         parsed.title = ogData.title;
       }
     }
   }
 
-  return parsed;
+  console.log(`\n[4] 🎯 FINAL ENRICHED ARTIFACT:`);
+  console.log(JSON.stringify(parsed, null, 2));
+  console.log(`======================================================\n`);
 }
+
+async function runTests() {
+  await testSearch("Lovable");
+  await testSearch("Inception movie");
+}
+
+runTests();
