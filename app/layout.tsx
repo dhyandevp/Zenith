@@ -75,13 +75,20 @@ export const metadata: Metadata = {
 
 import { ClerkProvider } from '@clerk/nextjs'
 
+const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+function ClerkWrapper({ children }: { children: React.ReactNode }) {
+  if (!clerkKey) return <>{children}</>
+  return <ClerkProvider publishableKey={clerkKey}>{children}</ClerkProvider>
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkWrapper>
       <html
         lang="en"
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
@@ -104,6 +111,6 @@ export default function RootLayout({
           {children}
         </body>
       </html>
-    </ClerkProvider>
+    </ClerkWrapper>
   );
 }
