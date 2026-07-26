@@ -6,6 +6,8 @@ import Link from "next/link";
 import { CategoryPlaceholder } from "../ui/CategoryPlaceholder";
 import type { Artifact } from "@/types/artifact";
 
+import { useState } from "react";
+
 interface ArtifactCardProps {
   artifact: Artifact;
   className?: string;
@@ -17,6 +19,8 @@ export function ArtifactCard({
   className,
   isFocused,
 }: ArtifactCardProps) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <Link
       href={`/artifact/${artifact.id}`}
@@ -28,12 +32,14 @@ export function ArtifactCard({
       )}
     >
       {/* Background Image or Placeholder */}
-      {artifact.imageUrl ? (
+      {artifact.imageUrl && !imgError ? (
         <div className="absolute inset-0 z-0 bg-pine/20">
           <Image
             src={artifact.imageUrl}
             alt={artifact.title}
             fill
+            unoptimized
+            onError={() => setImgError(true)}
             className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-90" />

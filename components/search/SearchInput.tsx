@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { useState, useRef, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Loader2, Sparkles, AlertCircle } from "lucide-react";
 import { searchWithAI } from "@/lib/actions/search";
@@ -10,7 +10,6 @@ import type { AIArtifactMetadata } from "@/types/artifact";
 
 export function SearchInput() {
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [suggestion, setSuggestion] = useState<AIArtifactMetadata | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,44 +20,31 @@ export function SearchInput() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Debounce logic
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 800);
+  async function handleSearch() {
+    const trimmed = query.trim();
+    if (trimmed.length < 2 || isAnalyzing) return;
 
-    return () => clearTimeout(handler);
-  }, [query]);
-
-  // Fetch suggestion
-  useEffect(() => {
-    async function fetchSuggestion() {
-      if (debouncedQuery.trim().length < 2) {
-        setSuggestion(null);
-        return;
-      }
-
-      setIsAnalyzing(true);
-      setError(null);
-      try {
-        const result = await searchWithAI(debouncedQuery);
-        setSuggestion(result);
-      } catch {
-        setError("Failed to analyze. Please try again.");
-      } finally {
-        setIsAnalyzing(false);
-      }
+    setIsAnalyzing(true);
+    setError(null);
+    setSuggestion(null);
+    try {
+      const result = await searchWithAI(trimmed);
+      setSuggestion(result);
+    } catch {
+      setError("Failed to analyze. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
     }
-
-    fetchSuggestion();
-  }, [debouncedQuery]);
+  }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!suggestion) return;
-
     if (e.key === "Enter") {
       e.preventDefault();
-      openPreview(suggestion);
+      if (suggestion) {
+        openPreview(suggestion);
+      } else {
+        handleSearch();
+      }
     }
   };
 
@@ -97,12 +83,22 @@ export function SearchInput() {
               onKeyDown={handleKeyDown}
               placeholder="Search anything — movies, games, books, URLs..."
               aria-label="Search for artifacts"
-              className="flex-1 bg-transparent border-none outline-none text-lg py-4 px-2 text-pine dark:text-clovers placeholder:text-timeless/70 font-body"
+              className="no-focus-ring flex-1 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none focus-visible:outline-none text-lg py-4 px-2 text-pine dark:text-clovers placeholder:text-timeless/70 font-body"
             />
+
+            {/* Search button */}
+            <button
+              onClick={handleSearch}
+              disabled={isAnalyzing || query.trim().length < 2}
+              className="mr-2 bg-pine dark:bg-clovers text-white dark:text-pine px-5 py-2.5 rounded-full font-display font-semibold text-sm flex items-center gap-2 hover:bg-pine/90 dark:hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            >
+              <Sparkles size={16} />
+              Analyze
+            </button>
           </div>
 
           <AnimatePresence>
-            {(suggestion || error) && query.length >= 2 && (
+            {(suggestion || error) && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -118,24 +114,25 @@ export function SearchInput() {
                 ) : suggestion ? (
                   <button
                     onClick={() => openPreview(suggestion)}
-                    className="w-full text-left flex items-center gap-4 p-3 rounded-[20px] transition-all duration-200 ease-out outline-none bg-white/60 dark:bg-black/30 shadow-sm"
+                    className="w-full text-left flex items-center gap-4 p-3 rounded-[20px] transition-all duration-200 ease-out outline-none bg-white/60 dark:bg-black/30 shadow-sm hover:bg-white/80 dark:hover:bg-black/40"
                   >
                     {suggestion.imageUrl ? (
-                      <div className="w-12 h-12 rounded-[12px] overflow-hidden relative shrink-0">
+                      <div className="w-14 h-14 rounded-[12px] overflow-hidden relative shrink-0">
                         <Image
                           src={suggestion.imageUrl}
-                          alt="Preview"
+                          alt={suggestion.title}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-[12px] bg-aquamarine/10 flex items-center justify-center shrink-0">
-                        <Sparkles size={20} className="text-aquamarine" />
+                      <div className="w-14 h-14 rounded-[12px] bg-aquamarine/10 flex items-center justify-center shrink-0">
+                        <Sparkles size={22} className="text-aquamarine" />
                       </div>
                     )}
 
-                    <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="font-display font-semibold text-pine dark:text-clovers truncate">
                           {suggestion.title}

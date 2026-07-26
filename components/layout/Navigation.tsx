@@ -1,5 +1,7 @@
+// components/layout/Navigation.tsx
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
+import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
 
 export function Navigation() {
   return (
@@ -22,6 +24,27 @@ export function Navigation() {
         >
           Collections
         </Link>
+
+        <div className="h-6 w-px bg-silver/30 mx-2" />
+
+        <SignedIn>
+          <UserButton
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8",
+              },
+            }}
+          />
+        </SignedIn>
+
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="border border-white/15 text-white/80 hover:text-white hover:border-white/30 rounded-full px-4 py-1.5 text-sm transition-all">
+              Sign In
+            </button>
+          </SignInButton>
+        </SignedOut>
       </div>
     </nav>
   );

@@ -17,19 +17,22 @@ import { CategoryPlaceholder } from "@/components/ui/CategoryPlaceholder";
 import type { Artifact } from "@/types/artifact";
 
 type ExtendedArtifact = Artifact & {
-  createdAt?: { toMillis: () => number };
+  createdAt?: { toMillis?: () => number; seconds?: number; nanoseconds?: number };
 };
 
 interface Props {
   artifactId: string;
+  initialArtifact?: ExtendedArtifact;
 }
 
-export function ArtifactDetailClient({ artifactId }: Props) {
+export function ArtifactDetailClient({ artifactId, initialArtifact }: Props) {
   const router = useRouter();
-  const [artifact, setArtifact] = useState<ExtendedArtifact | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [artifact, setArtifact] = useState<ExtendedArtifact | null>(initialArtifact || null);
+  const [loading, setLoading] = useState(!initialArtifact);
 
   useEffect(() => {
+    if (initialArtifact) return;
+    
     async function fetchArtifact() {
       try {
         const docRef = doc(db, "artifacts", artifactId);
@@ -51,7 +54,7 @@ export function ArtifactDetailClient({ artifactId }: Props) {
     }
 
     fetchArtifact();
-  }, [artifactId, router]);
+  }, [artifactId, router, initialArtifact]);
 
   if (loading) {
     return (
@@ -75,6 +78,7 @@ export function ArtifactDetailClient({ artifactId }: Props) {
             src={artifact.imageUrl}
             alt="Background"
             fill
+            unoptimized
             className="object-cover blur-3xl scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-clovers/50 to-clovers dark:from-pine/50 dark:to-pine" />
@@ -99,6 +103,7 @@ export function ArtifactDetailClient({ artifactId }: Props) {
                   src={artifact.imageUrl}
                   alt={artifact.title}
                   fill
+                  unoptimized
                   className="object-cover"
                   priority
                 />
@@ -120,7 +125,7 @@ export function ArtifactDetailClient({ artifactId }: Props) {
             </div>
 
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-pine dark:text-clovers leading-tight mb-6 tracking-tight">
-              {artifact.title}
+              {artifact.title} <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 text-pine/70 dark:text-clovers/70 font-medium">- AI Summary, Features & Alternatives</span>
             </h1>
 
             <p className="font-body text-lg text-pine/80 dark:text-silver/90 leading-relaxed mb-8 max-w-2xl">
@@ -180,7 +185,11 @@ export function ArtifactDetailClient({ artifactId }: Props) {
             </div>
             <p className="font-display text-lg text-pine dark:text-clovers font-medium">
               {artifact.createdAt
-                ? new Date(artifact.createdAt.toMillis()).toLocaleDateString()
+                ? new Date(
+                    typeof artifact.createdAt.toMillis === "function"
+                      ? artifact.createdAt.toMillis()
+                      : (artifact.createdAt.seconds || 0) * 1000
+                  ).toLocaleDateString()
                 : "Unknown"}
             </p>
           </div>

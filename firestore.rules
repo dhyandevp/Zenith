@@ -1,16 +1,43 @@
+// firestore.rules — Production-grade security rules for Zenith
+//
+// IMPORTANT: Zenith uses Clerk for auth (not Firebase Auth).
+// Since Clerk doesn't mint Firebase tokens by default, request.auth will be null
+// for client-side writes. Two options:
+//
+//   Option A (RECOMMENDED — simpler): Firestore writes go through server actions
+//   (search.ts) which run server-side. The submittedBy field stores Clerk's userId
+//   as a plain string. Client-side Firestore is read-only.
+//
+//   Option B: Use Clerk's Firebase integration to mint custom Firebase tokens.
+//   This lets request.auth work for client writes but adds complexity.
+//
+// Zenith uses Option A — server-side writes with Clerk auth, client read-only.
+//
+// Deploy: firebase deploy --only firestore:rules
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Artifacts — public read, no client writes
+
     match /artifacts/{artifactId} {
+      // PUBLIC READ — required for SEO, Google indexing, JSON-LD, OG previews
       allow read: if true;
-      allow write: if false;
+
+      // AUTHENTICATED CREATE — only signed-in users can submit artifacts
+      // Validates submittedBy matches requesting user UID and title is non-empty
+      allow create: if request.auth != null
+                    && request.resource.data.submittedBy == request.auth.uid
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0;
+
+      // OWNER-ONLY UPDATE + DELETE
+      allow update, delete: if request.auth != null
+                             && resource.data.submittedBy == request.auth.uid;
     }
 
-    // Collections — public read, no client writes
-    match /collections/{collectionId} {
-      allow read: if true;
-      allow write: if false;
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

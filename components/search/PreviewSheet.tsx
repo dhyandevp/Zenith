@@ -1,11 +1,19 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   ExternalLink,
   Tag as TagIcon,
   BarChart2,
+  Plus,
+  Check,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
+import { saveArtifact } from "@/lib/actions/search";
 import type { AIArtifactMetadata } from "@/types/artifact";
 
 interface PreviewSheetProps {
@@ -14,11 +22,43 @@ interface PreviewSheetProps {
   onClose: () => void;
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function PreviewSheet({
   artifact,
   isOpen,
   onClose,
 }: PreviewSheetProps) {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  async function handleSave() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const slug = slugify(artifact.title);
+      await saveArtifact(slug, artifact);
+      setSaved(true);
+      // Navigate to the new artifact page after a short delay
+      setTimeout(() => {
+        onClose();
+        router.push(`/artifact/${slug}`);
+      }, 800);
+    } catch (err) {
+      console.error(err);
+      setSaveError("Failed to save. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -54,6 +94,7 @@ export function PreviewSheet({
                     src={artifact.imageUrl}
                     alt={artifact.title}
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>
@@ -113,16 +154,50 @@ export function PreviewSheet({
               </div>
             </div>
 
-            {artifact.url && (
-              <a
-                href={artifact.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-pine dark:bg-clovers text-white dark:text-pine py-4 rounded-[16px] font-display font-semibold text-lg flex items-center justify-center gap-2 hover:bg-pine/90 dark:hover:bg-white transition-colors"
+            {/* Action buttons */}
+            <div className="flex flex-col gap-3">
+              {/* Save to Zenith button */}
+              <button
+                onClick={handleSave}
+                disabled={saving || saved}
+                className={`w-full py-4 rounded-[16px] font-display font-semibold text-lg flex items-center justify-center gap-2 transition-colors ${
+                  saved
+                    ? "bg-emerald-500 text-white"
+                    : "bg-pine dark:bg-clovers text-white dark:text-pine hover:bg-pine/90 dark:hover:bg-white"
+                } disabled:opacity-70`}
               >
-                <ExternalLink size={20} /> Visit Source
-              </a>
-            )}
+                {saving ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" /> Saving...
+                  </>
+                ) : saved ? (
+                  <>
+                    <Check size={20} /> Saved to Zenith!
+                  </>
+                ) : (
+                  <>
+                    <Plus size={20} /> Save to Zenith
+                  </>
+                )}
+              </button>
+
+              {saveError && (
+                <p className="text-red-500 text-sm text-center font-body">
+                  {saveError}
+                </p>
+              )}
+
+              {artifact.url && (
+                <a
+                  href={artifact.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-white/40 dark:bg-white/10 text-pine dark:text-silver py-4 rounded-[16px] font-display font-semibold text-lg flex items-center justify-center gap-2 hover:bg-white/60 dark:hover:bg-white/20 transition-colors"
+                >
+                  <ExternalLink size={20} /> Visit Source
+                </a>
+              )}
+            </div>
           </motion.div>
         </>
       )}

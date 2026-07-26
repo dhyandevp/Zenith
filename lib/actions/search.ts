@@ -4,6 +4,8 @@ import type { AIArtifactMetadata } from "@/types/artifact";
 import { VALID_TYPES } from "@/constants/categories";
 import * as cheerio from "cheerio";
 
+import { auth } from "@clerk/nextjs/server";
+
 // Utility to fetch and extract OpenGraph metadata from a URL
 async function fetchOpenGraphData(url: string) {
   try {
@@ -12,7 +14,7 @@ async function fetchOpenGraphData(url: string) {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
       },
-      signal: AbortSignal.timeout(4000), // 4 second timeout
+      signal: AbortSignal.timeout(2000), // 2 second timeout to keep UI snappy
     });
 
     if (!response.ok) return null;
@@ -41,6 +43,11 @@ async function fetchOpenGraphData(url: string) {
 }
 
 export async function searchWithAI(query: string): Promise<AIArtifactMetadata> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error('Sign in to add artifacts to Zenith');
+  }
+
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new Error(
@@ -125,5 +132,41 @@ CRITICAL: Do not invent metadata. Favor precision over hallucination. Prioritize
     }
   }
 
-  return parsed;
+  // Attach auth metadata for Firestore writes
+  return {
+    ...parsed,
+    submittedBy: userId,
+    submittedAt: new Date().toISOString(),
+  };
 }
+
+export async function saveArtifact(slug: string, artifact: AIArtifactMetadata) {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error('Sign in to save artifacts to Zenith');
+  }
+
+  // Import dynamically so it doesn't break client components that might accidentally import this file
+  const { adminDb } = await import("@/lib/firebase-admin");
+
+  try {
+    await adminDb.collection("artifacts").doc(slug).set({
+      title: artifact.title,
+      description: artifact.description,
+      type: artifact.type,
+      source: artifact.source,
+      url: artifact.url || null,
+      imageUrl: artifact.imageUrl || null,
+      tags: artifact.tags,
+      confidence: artifact.confidence,
+      submittedBy: userId, // enforce server-side user ID
+      submittedAt: artifact.submittedAt || new Date().toISOString(),
+      createdAt: new Date(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to save artifact:", error);
+    throw new Error("Failed to save artifact to Firestore");
+  }
+}
+

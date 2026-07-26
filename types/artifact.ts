@@ -24,6 +24,7 @@ export interface Artifact {
   url?: string;
   tags?: string[];
   createdAt?: { toMillis: () => number };
+  userId?: string;
 }
 
 /** AI-classified metadata returned from the search server action */
@@ -36,4 +37,6 @@ export interface AIArtifactMetadata {
   imageUrl?: string;
   tags: string[];
   confidence: number;
+  submittedBy?: string;
+  submittedAt?: string;
 }

@@ -73,32 +73,37 @@ export const metadata: Metadata = {
   },
 };
 
+import { ClerkProvider } from '@clerk/nextjs'
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "Zenith",
-              url: process.env.NEXT_PUBLIC_APP_URL || "https://zenith.app",
-              description: "Discover, explore, and share curated digital artifacts.",
-            }),
-          }}
-        />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
+        suppressHydrationWarning
+        data-scroll-behavior="smooth"
+      >
+        <body className="min-h-full flex flex-col" suppressHydrationWarning>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Zenith",
+                url: process.env.NEXT_PUBLIC_APP_URL || "https://zenith.app",
+                description: "Discover, explore, and share curated digital artifacts.",
+              }),
+            }}
+          />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
