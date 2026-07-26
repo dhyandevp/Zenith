@@ -146,11 +146,10 @@ export async function saveArtifact(slug: string, artifact: AIArtifactMetadata) {
     throw new Error('Sign in to save artifacts to Zenith');
   }
 
-  // Import dynamically so it doesn't break client components that might accidentally import this file
-  const { adminDb } = await import("@/lib/firebase-admin");
+  const { setDocument } = await import("@/lib/firestore-rest");
 
   try {
-    await adminDb.collection("artifacts").doc(slug).set({
+    await setDocument("artifacts", slug, {
       title: artifact.title,
       description: artifact.description,
       type: artifact.type,
@@ -159,7 +158,7 @@ export async function saveArtifact(slug: string, artifact: AIArtifactMetadata) {
       imageUrl: artifact.imageUrl || null,
       tags: artifact.tags,
       confidence: artifact.confidence,
-      submittedBy: userId, // enforce server-side user ID
+      submittedBy: userId,
       submittedAt: artifact.submittedAt || new Date().toISOString(),
       createdAt: new Date(),
     });
