@@ -75,7 +75,7 @@ export const metadata: Metadata = {
 
 import { ClerkProvider } from '@clerk/nextjs'
 
-const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+const clerkKey = process.env.CLERK_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 function ClerkWrapper({ children }: { children: React.ReactNode }) {
   if (!clerkKey) return <>{children}</>
